@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package chat_server;
+option go_package = "./chat_server";
+
+message EmptyResp {
+}
+
+
+message CreateChatReq {
+  // 群名称
+  string name = 1;
+  //  1 = 普通群聊
+  int32 type = 2;
+  // 需要加入群的用户
+  repeated int64 Uids = 3;
+}
+
+message CreateChatResp {
+  // 群聊ID
+  int64 id = 1;
+}
+
+message Msg {
+  int64 ID = 1;
+  int64 sender = 2;
+  int64 chatID = 3;
+  string content = 4;
+  int64 seq = 5;
+  int64  type = 6;
+}
+
+message RecentChatsReq {
+  int64 nextSeq = 1;
+  int64 cnt = 2;
+  string order = 3;
+}
+
+message RecentChatsResp {
+  int64 id = 1;
+  string name = 2;
+  int32 type = 3;
+  string creator =4;
+  int64 ctime = 5;
+  Msg lastMsg = 6;
+}
+
+message JoinToChatReq {
+  int64 chatID = 1;
+  repeated int64 Uids = 2;
+}
+
+message RemoveMemberFromChatReq {
+  int64 chatID = 1;
+  int64 Uid = 2;
+}
+
+message GetChatMsgListReq {
+  int64 chatID = 1;
+  int64 next_seq = 2;
+  int64 cnt = 3;
+}
+
+message GetChatMsgListResp {
+  repeated Msg msgs  = 1;
+  int64 cnt = 2;
+  int64 nextSeq = 3;
+}
+
+message GetMemberListReq {
+  int64 chatID = 1;
+  int64 nextSeq = 2;
+  int64 cnt = 3;
+}
+
+message GetMemberListResp {
+  int64 id = 1;
+  int64 nextSeq = 2;
+  int64 cnt = 3;
+  repeated Member MemberList = 4;
+}
+
+message Member {
+  int64 id = 1;
+  int64 ctime = 2;
+  int32 role = 3;
+}
+
+service chat {
+  rpc createChat(CreateChatReq) returns (CreateChatResp);
+  rpc recentChats(RecentChatsReq) returns (RecentChatsResp);
+  rpc joinToChat(JoinToChatReq) returns(EmptyResp);
+  rpc removeMemberFromChat(RemoveMemberFromChatReq) returns (EmptyResp);
+  rpc getChatMsgList(GetChatMsgListReq) returns (GetChatMsgListResp);
+  rpc getMemberList(GetMemberListReq) returns (GetMemberListResp);
+}
