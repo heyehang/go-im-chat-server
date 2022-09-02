@@ -6,4 +6,19 @@ import (
 
 type Config struct {
 	zrpc.RpcServerConf
+	WorkPoolSize int `json:",optional"`
+	Pulsar       *Pulsar
+	UserSrv      zrpc.RpcClientConf
+}
+
+type Pulsar struct {
+	Url string `json:",optional"`
+	// 单位秒
+	ConnectionTimeout int `json:",optional"`
+	// 单位秒
+	OperationTimeout int `json:",optional"`
+	// 最大连接数
+	MaxConnectionsPerBroker int `json:",optional"`
+	// 订阅topic
+	Topic string `json:",optional"`
 }

@@ -1,6 +1,24 @@
 Name: chat.rpc
 ListenOn: 0.0.0.0:9200
+
+WorkPoolSize: 2048
+
 Etcd:
   Hosts:
   - 127.0.0.1:2379
   Key: chat.rpc
+
+
+Pulsar:
+  Url: pulsar://localhost:6650
+  ConnectionTimeout: 10
+  OperationTimeout: 10
+  MaxConnectionsPerBroker: 100
+  Topic: im_server_msg_general
+
+
+UserSrv:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: userserver.rpc
