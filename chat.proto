@@ -13,7 +13,8 @@ message CreateChatReq {
   //  1 = 普通群聊
   int32 type = 2;
   // 需要加入群的用户
-  repeated int64 Uids = 3;
+  repeated int64 uids = 3;
+  string  token = 4;
 }
 
 message CreateChatResp {
@@ -22,18 +23,19 @@ message CreateChatResp {
 }
 
 message Msg {
-  int64 ID = 1;
+  int64 id = 1;
   int64 sender = 2;
-  int64 chatID = 3;
+  int64 chat_id = 3;
   string content = 4;
   int64 seq = 5;
   int64  type = 6;
 }
 
 message RecentChatsReq {
-  int64 nextSeq = 1;
+  int64 next_seq = 1;
   int64 cnt = 2;
   string order = 3;
+  string  token = 4;
 }
 
 message RecentChatsResp {
@@ -42,42 +44,46 @@ message RecentChatsResp {
   int32 type = 3;
   string creator =4;
   int64 ctime = 5;
-  Msg lastMsg = 6;
+  Msg last_msg = 6;
 }
 
 message JoinToChatReq {
-  int64 chatID = 1;
-  repeated int64 Uids = 2;
+  int64 chat_id = 1;
+  repeated int64 uids = 2;
+  string  token = 3;
 }
 
 message RemoveMemberFromChatReq {
-  int64 chatID = 1;
-  int64 Uid = 2;
+  int64 chat_id = 1;
+  int64 uid = 2;
+  string  token = 3;
 }
 
 message GetChatMsgListReq {
-  int64 chatID = 1;
+  int64 chat_id = 1;
   int64 next_seq = 2;
   int64 cnt = 3;
+  string  token = 4;
 }
 
 message GetChatMsgListResp {
   repeated Msg msgs  = 1;
   int64 cnt = 2;
-  int64 nextSeq = 3;
+  int64 next_seq = 3;
 }
 
 message GetMemberListReq {
-  int64 chatID = 1;
-  int64 nextSeq = 2;
+  int64 chat_id = 1;
+  int64 next_seq = 2;
   int64 cnt = 3;
+  string token = 4;
 }
 
 message GetMemberListResp {
   int64 id = 1;
-  int64 nextSeq = 2;
+  int64 next_seq = 2;
   int64 cnt = 3;
-  repeated Member MemberList = 4;
+  repeated Member member_list = 4;
 }
 
 message Member {
