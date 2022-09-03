@@ -23,8 +23,15 @@ func NewCreateChatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 	}
 }
 
-func (l *CreateChatLogic) CreateChat(in *chat_server.CreateChatReq) (*chat_server.CreateChatResp, error) {
-	// todo: add your logic here and delete this line
+func (l *CreateChatLogic) CreateChat(req *chat_server.CreateChatReq) (resp *chat_server.CreateChatResp, err error) {
+	if req == nil {
+		return
+	}
+	//todo 待实现
+	return
+}
 
-	return &chat_server.CreateChatResp{}, nil
+func (l *CreateChatLogic) checkArg(req *chat_server.CreateChatReq) (err error) {
+
+	return
 }
