@@ -9,10 +9,13 @@ import (
 )
 
 func Init(conf config.Config) {
-	pulsarsdk.Init(pulsar.ClientOptions{
+	err := pulsarsdk.Init(pulsar.ClientOptions{
 		URL:                     conf.Pulsar.Url,
 		ConnectionTimeout:       time.Second * time.Duration(conf.Pulsar.ConnectionTimeout),
 		OperationTimeout:        time.Second * time.Duration(conf.Pulsar.OperationTimeout),
 		MaxConnectionsPerBroker: conf.Pulsar.MaxConnectionsPerBroker,
 	})
+	if err != nil {
+		panic(err)
+	}
 }

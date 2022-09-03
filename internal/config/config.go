@@ -9,6 +9,7 @@ type Config struct {
 	WorkPoolSize int `json:",optional"`
 	Pulsar       *Pulsar
 	UserSrv      zrpc.RpcClientConf
+	Mongo        *Mongo
 }
 
 type Pulsar struct {
@@ -21,4 +22,14 @@ type Pulsar struct {
 	MaxConnectionsPerBroker int `json:",optional"`
 	// 订阅topic
 	Topic string `json:",optional"`
+	// im-work 消费消息的topic
+	WorkTopic string `json:",optional"`
+}
+
+type Mongo struct {
+	Addr     string
+	Db       string
+	User     string `json:",optional"`
+	Pwd      string `json:",optional"`
+	PoolSize int    `json:",optional"`
 }
