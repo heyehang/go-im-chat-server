@@ -1,5 +1,5 @@
 Name: chat.rpc
-ListenOn: 0.0.0.0:9200
+ListenOn: 0.0.0.0:9300
 
 WorkPoolSize: 2048
 
