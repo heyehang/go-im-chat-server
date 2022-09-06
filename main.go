@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/zeromicro/go-zero/core/logx"
 	"go-im-chat-server/internal/dao/mongo"
 	"go-im-chat-server/internal/work"
 	"go-im-chat-server/pkg/pulsar"
@@ -13,13 +14,13 @@ import (
 	"syscall"
 
 	"github.com/heyehang/go-im-grpc/chat_server"
-	"go-im-chat-server/internal/config"
-	"go-im-chat-server/internal/server"
-	"go-im-chat-server/internal/svc"
-
+	"github.com/heyehang/go-im-pkg/tlog"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/zrpc"
+	"go-im-chat-server/internal/config"
+	"go-im-chat-server/internal/server"
+	"go-im-chat-server/internal/svc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -30,6 +31,13 @@ func main() {
 	flag.Parse()
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
+	logx.MustSetup(c.Log)
+
+	fileWriter := logx.Reset()
+	writer, err := tlog.NewMultiWriter(fileWriter)
+	logx.Must(err)
+	logx.SetWriter(writer)
+
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	ctx := svc.NewServiceContext(c)

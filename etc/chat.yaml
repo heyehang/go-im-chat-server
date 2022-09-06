@@ -5,12 +5,14 @@ WorkPoolSize: 2048
 
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+  - 159.75.35.91:2379
   Key: chat.rpc
+  User: root
+  Pass: im-server-256/?
 
 
 Pulsar:
-  Url: pulsar://localhost:6650
+  Url: pulsar://106.52.4.215:6650
   ConnectionTimeout: 10
   OperationTimeout: 10
   MaxConnectionsPerBroker: 100
@@ -21,12 +23,18 @@ Pulsar:
 UserSrv:
   Etcd:
     Hosts:
-      - 127.0.0.1:2379
+      - 159.75.35.91:2379
     Key: userserver.rpc
+    User: root
+    Pass: im-server-256/?
 
 Mongo:
-    Addr: mongodb://localhost:27017
-    Db: test
-    User: admin
-    Pwd: '12345678'
+    Addr: mongodb://159.75.35.91:27017
+    Db: im-server
+    User: im-server
+    Pwd: im-server-256/?
     PoolSize: 40
+
+Log:
+  Mode : volume
+  ServiceName : chatserver
