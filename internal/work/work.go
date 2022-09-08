@@ -5,6 +5,7 @@ import (
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/bytedance/sonic"
 	"github.com/heyehang/go-im-grpc/user_server"
+	"github.com/heyehang/go-im-pkg/hack"
 	"github.com/heyehang/go-im-pkg/pulsarsdk"
 	"github.com/panjf2000/ants/v2"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -43,7 +44,12 @@ func NewWork(c config.Config) *Work {
 
 func (w *Work) Start(ctx context.Context) {
 	pulsarsdk.SubscribeMsg(ctx, w.con.Pulsar.Topic, func(message pulsar.Message, err error) {
+		if err != nil {
+			logx.Errorf("SubscribeMsg_Unmarshal_err :%+v", err)
+			return
+		}
 		data := message.Payload()
+		logx.Info("SubscribeMsg ", hack.String(data))
 		msg := new(model.Msg)
 		err = sonic.Unmarshal(data, msg)
 		if err != nil {

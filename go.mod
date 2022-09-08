@@ -6,7 +6,7 @@ require (
 	github.com/apache/pulsar-client-go v0.8.1
 	github.com/bytedance/sonic v1.4.0
 	github.com/heyehang/go-im-grpc v0.0.0-20220903143921-d4b4068140cc
-	github.com/heyehang/go-im-pkg v0.0.0-20220906082711-4b01a14ca8a8
+	github.com/heyehang/go-im-pkg v0.0.0-20220908092825-48ff4346c720
 	github.com/panjf2000/ants/v2 v2.5.0
 	github.com/pkg/errors v0.9.1
 	github.com/zeromicro/go-zero v1.4.0
@@ -49,6 +49,7 @@ require (
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect

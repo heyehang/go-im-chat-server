@@ -35,3 +35,4 @@ func InsertChatMember(ctx context.Context, members []interface{}) (err error) {
 	}
 	return
 }
+
