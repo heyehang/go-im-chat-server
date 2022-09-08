@@ -14,7 +14,7 @@ func Init(conf config.Config) {
 		ConnectionTimeout:       time.Second * time.Duration(conf.Pulsar.ConnectionTimeout),
 		OperationTimeout:        time.Second * time.Duration(conf.Pulsar.OperationTimeout),
 		MaxConnectionsPerBroker: conf.Pulsar.MaxConnectionsPerBroker,
-	})
+	}, 10000)
 	if err != nil {
 		panic(err)
 	}

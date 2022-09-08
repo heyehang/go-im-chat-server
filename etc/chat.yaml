@@ -15,7 +15,7 @@ Pulsar:
   Url: pulsar://106.52.4.215:6650
   ConnectionTimeout: 10
   OperationTimeout: 10
-  MaxConnectionsPerBroker: 100
+  MaxConnectionsPerBroker: 30
   Topic: im_server_msg_general
   WorkTopic: semd_msg_to_user_topic
 
