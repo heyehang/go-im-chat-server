@@ -4,28 +4,32 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/zeromicro/go-zero/core/logx"
-	"go-im-chat-server/internal/dao/mongo"
-	"go-im-chat-server/internal/work"
-	"go-im-chat-server/pkg/pulsar"
-	"os"
-	"os/signal"
-	"sync"
-	"syscall"
-
 	"github.com/heyehang/go-im-grpc/chat_server"
 	"github.com/heyehang/go-im-pkg/tlog"
+	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/zrpc"
 	"go-im-chat-server/internal/config"
+	"go-im-chat-server/internal/dao/mongo"
 	"go-im-chat-server/internal/server"
 	"go-im-chat-server/internal/svc"
+	"go-im-chat-server/internal/work"
+	"go-im-chat-server/pkg/pulsar"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"os"
+	"os/signal"
+	"runtime"
+	"sync"
+	"syscall"
 )
 
-var configFile = flag.String("f", "etc/chat.yaml", "the config file")
+var (
+	profile    *pyroscope.Profiler
+	configFile = flag.String("f", "etc/chat.yaml", "the config file")
+)
 
 func main() {
 	flag.Parse()
@@ -65,6 +69,17 @@ func main() {
 		defer wg.Done()
 		w.Start(cancelCtx)
 	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		defer func() {
+			if profile != nil {
+				_ = profile.Stop()
+			}
+		}()
+		startPyroscope()
+	}()
+
 	sig := make(chan os.Signal, 1)
 	//syscall.SIGINT 线上记得加上这个信号 ctrl + c
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM)
@@ -78,5 +93,39 @@ func main() {
 		default:
 			return
 		}
+	}
+}
+
+func startPyroscope() {
+	runtime.SetMutexProfileFraction(5)
+	runtime.SetBlockProfileRate(5)
+	var err error
+	profile, err = pyroscope.Start(pyroscope.Config{
+		ApplicationName: "go-im-chat-server",
+		// replace this with the address of pyroscope server
+		ServerAddress: "http://172.16.0.15:4040",
+		// you can disable logging by setting this to nil
+		Logger: pyroscope.StandardLogger,
+		// optionally, if authentication is enabled, specify the API key:
+		// AuthToken: os.Getenv("PYROSCOPE_AUTH_TOKEN"),
+		ProfileTypes: []pyroscope.ProfileType{
+			// these profile types are enabled by default:
+			pyroscope.ProfileCPU,
+			pyroscope.ProfileAllocObjects,
+			pyroscope.ProfileAllocSpace,
+			pyroscope.ProfileInuseObjects,
+			pyroscope.ProfileInuseSpace,
+			// these profile types are optional:
+			pyroscope.ProfileGoroutines,
+			pyroscope.ProfileMutexCount,
+			pyroscope.ProfileMutexDuration,
+			pyroscope.ProfileBlockCount,
+			pyroscope.ProfileBlockDuration,
+		},
+		SampleRate: 200,
+	})
+	if err != nil {
+		panic(err)
+		return
 	}
 }

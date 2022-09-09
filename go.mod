@@ -9,6 +9,7 @@ require (
 	github.com/heyehang/go-im-pkg v0.0.0-20220908134029-f2f5329e8e45
 	github.com/panjf2000/ants/v2 v2.5.0
 	github.com/pkg/errors v0.9.1
+	github.com/pyroscope-io/client v0.3.0
 	github.com/zeromicro/go-zero v1.4.0
 	go.mongodb.org/mongo-driver v1.10.2
 	google.golang.org/grpc v1.49.0
