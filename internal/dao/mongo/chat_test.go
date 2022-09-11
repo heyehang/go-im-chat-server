@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-//var configFile = flag.String("f", "../../../etc/chat.yaml", "the config file")
+//var configFile = flag.String("f", "/Users/mac/go/src/go-im-chat-server/etc/chat.yaml", "the config file")
 
 func TestGetMembersByChatID(t *testing.T) {
 	//flag.Parse()
@@ -28,13 +28,13 @@ func TestGetMembersByChatID(t *testing.T) {
 	//	panic(err)
 	//	return
 	//}
-
-	//uids, err := GetMembersByChatID(context.Background(), "1", 10, 0)
+	//
+	//uids, err := GetMembersByChatID(context.Background(), "1", 100, 0)
 	//if err != nil {
 	//	panic(err)
 	//	return
 	//}
-
+	//
 	//fmt.Println("查询到的:", uids)
 
 }

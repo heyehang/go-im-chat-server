@@ -89,21 +89,6 @@ func createChatMsgIndex(ctx context.Context) {
 	}
 }
 
-//// _uniq_chat_id_user_id
-//// _idx_user_id_chat_id
-//// _idx_chatid_role_utime
-//// _idx_ctime
-//// _idx_utime
-//type ChatMember struct {
-//	ID           primitive.ObjectID `bson:"_id"`
-//	ChatMemberID string             `json:"id" bson:"id"`
-//	ChatId       string             `json:"chat_id" bson:"chat_id"`
-//	UserID       int64              `json:"user_id" bson:"user_id"`
-//	CTime        int64              `json:"ctime" bson:"ctime"`
-//	UTime        int64              `json:"utime" bson:"utime"`
-//	Role         uint8              `json:"role" bson:"role"`
-//}
-
 func createChatMemberIndex(ctx context.Context) {
 	uniq := true
 	idIndex := mongo.IndexModel{

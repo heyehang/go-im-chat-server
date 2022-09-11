@@ -5,7 +5,6 @@ import (
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/bytedance/sonic"
 	"github.com/heyehang/go-im-grpc/user_server"
-	"github.com/heyehang/go-im-pkg/hack"
 	"github.com/heyehang/go-im-pkg/pulsarsdk"
 	"github.com/panjf2000/ants/v2"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -13,14 +12,17 @@ import (
 	"go-im-chat-server/internal/config"
 	"go-im-chat-server/internal/dao/model"
 	"go-im-chat-server/internal/dao/mongo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"sync"
 	"time"
 )
 
 type Work struct {
-	pool     *ants.Pool
-	con      config.Config
-	userCli  user_server.UserClient
-	producer *pulsarsdk.Producer
+	pool            *ants.Pool
+	con             config.Config
+	userCli         user_server.UserClient
+	producer        *pulsarsdk.Producer
+	insertMongoPool *sync.Pool
 }
 
 func NewWork(c config.Config) *Work {
@@ -39,6 +41,11 @@ func NewWork(c config.Config) *Work {
 		return nil
 	}
 	w.producer = prod
+	poollNewFunc := func() any {
+		buf := make([]interface{}, 0, 3)
+		return buf
+	}
+	w.insertMongoPool = &sync.Pool{New: poollNewFunc}
 	return w
 }
 
@@ -49,11 +56,25 @@ func (w *Work) Start(ctx context.Context) {
 			return
 		}
 		data := message.Payload()
-		logx.Info("SubscribeMsg ", hack.String(data))
 		msg := new(model.Msg)
 		err = sonic.Unmarshal(data, msg)
 		if err != nil {
 			logx.Errorf("SubscribeMsg_Unmarshal_err :%+v", err)
+			return
+		}
+		msg.ID = primitive.NewObjectID()
+		msg.MsgId = msg.ID.String()
+		msg.Seq = uint64(time.Now().UnixNano())
+		insertCtx, insertCtxCancel := context.WithTimeout(context.Background(), time.Second*30)
+		defer insertCtxCancel()
+		buf, ok := w.insertMongoPool.Get().([]interface{})
+		if !ok {
+			buf = make([]interface{}, 0, 1)
+		}
+		buf = append(buf, msg)
+		err = mongo.InsertMsg(insertCtx, buf)
+		if err != nil {
+			logx.Errorf("SubscribeMsg_InsertMsg_err :%+v", err)
 			return
 		}
 		// 找群成员
@@ -69,17 +90,20 @@ func (w *Work) Start(ctx context.Context) {
 				logx.Errorf("SubscribeMsg_GetMembersByChatID_err :%+v", err)
 				return
 			}
+			members = append(members, uids...)
+			skip = skip + batch
 			if len(uids) < int(batch) {
 				break
 			}
-			members = append(members, uids...)
-			skip = skip + batch
+		}
+		if len(members) <= 0 {
+			return
 		}
 		req := new(user_server.GetDeviceTokensByUserIDReq)
 		for i := 0; i < len(members); i++ {
 			req.Ids = append(req.Ids, members[i].UserID)
 		}
-		grpcCtx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+		grpcCtx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
 		resp, err := w.userCli.GetDeviceTokensByUserID(grpcCtx, req)
 		if err != nil {
