@@ -6,10 +6,11 @@ import (
 
 type Config struct {
 	zrpc.RpcServerConf
-	WorkPoolSize int `json:",optional"`
-	Pulsar       *Pulsar
-	UserSrv      zrpc.RpcClientConf
-	Mongo        *Mongo
+	WorkPoolSize  int `json:",optional"`
+	Pulsar        *Pulsar
+	UserSrv       zrpc.RpcClientConf
+	Mongo         *Mongo
+	PyroscopeAddr string `json:",optional"`
 }
 
 type Pulsar struct {

@@ -72,12 +72,12 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		startPyroscope(c)
 		defer func() {
 			if profile != nil {
 				_ = profile.Stop()
 			}
 		}()
-		startPyroscope()
 	}()
 
 	sig := make(chan os.Signal, 1)
@@ -96,15 +96,17 @@ func main() {
 	}
 }
 
-func startPyroscope() {
-	runtime.SetMutexProfileFraction(5)
-	runtime.SetBlockProfileRate(5)
+func startPyroscope(conf config.Config) {
+	// todo 生产可建议注释此代码
+	runtime.SetMutexProfileFraction(100)
+	runtime.SetBlockProfileRate(100)
 	var err error
 	profile, err = pyroscope.Start(pyroscope.Config{
-		ApplicationName: "go-im-chat-server",
+		ApplicationName: conf.Name,
 		// replace this with the address of pyroscope server
-		ServerAddress: "http://172.16.0.15:4040",
+		ServerAddress: conf.PyroscopeAddr,
 		// you can disable logging by setting this to nil
+		// todo 可替换log
 		Logger: pyroscope.StandardLogger,
 		// optionally, if authentication is enabled, specify the API key:
 		// AuthToken: os.Getenv("PYROSCOPE_AUTH_TOKEN"),
