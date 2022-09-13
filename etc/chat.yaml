@@ -1,6 +1,5 @@
 Name: chat.rpc
 ListenOn: 0.0.0.0:9400
-
 WorkPoolSize: 2048
 PyroscopeAddr: 'http://127.0.0.1:4040'
 

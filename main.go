@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/heyehang/go-im-grpc/chat_server"
 	"github.com/heyehang/go-im-pkg/tlog"
-	"github.com/pyroscope-io/client/pyroscope"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
@@ -17,17 +16,16 @@ import (
 	"go-im-chat-server/internal/svc"
 	"go-im-chat-server/internal/work"
 	"go-im-chat-server/pkg/pulsar"
+	"go-im-chat-server/pkg/pyroscope"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"os"
 	"os/signal"
-	"runtime"
 	"sync"
 	"syscall"
 )
 
 var (
-	profile    *pyroscope.Profiler
 	configFile = flag.String("f", "etc/chat.yaml", "the config file")
 )
 
@@ -41,7 +39,6 @@ func main() {
 	writer, err := tlog.NewMultiWriter(fileWriter)
 	logx.Must(err)
 	logx.SetWriter(writer)
-
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	ctx := svc.NewServiceContext(c)
@@ -69,17 +66,7 @@ func main() {
 		defer wg.Done()
 		w.Start(cancelCtx)
 	}()
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		startPyroscope(c)
-		defer func() {
-			if profile != nil {
-				_ = profile.Stop()
-			}
-		}()
-	}()
-
+	pyroscope.Start(cancelCtx, wg, c.Name, c.PyroscopeAddr, nil, true)
 	sig := make(chan os.Signal, 1)
 	//syscall.SIGINT 线上记得加上这个信号 ctrl + c
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM)
@@ -93,41 +80,5 @@ func main() {
 		default:
 			return
 		}
-	}
-}
-
-func startPyroscope(conf config.Config) {
-	// todo 生产可建议注释此代码
-	runtime.SetMutexProfileFraction(100)
-	runtime.SetBlockProfileRate(100)
-	var err error
-	profile, err = pyroscope.Start(pyroscope.Config{
-		ApplicationName: conf.Name,
-		// replace this with the address of pyroscope server
-		ServerAddress: conf.PyroscopeAddr,
-		// you can disable logging by setting this to nil
-		// todo 可替换log
-		Logger: pyroscope.StandardLogger,
-		// optionally, if authentication is enabled, specify the API key:
-		// AuthToken: os.Getenv("PYROSCOPE_AUTH_TOKEN"),
-		ProfileTypes: []pyroscope.ProfileType{
-			// these profile types are enabled by default:
-			pyroscope.ProfileCPU,
-			pyroscope.ProfileAllocObjects,
-			pyroscope.ProfileAllocSpace,
-			pyroscope.ProfileInuseObjects,
-			pyroscope.ProfileInuseSpace,
-			// these profile types are optional:
-			pyroscope.ProfileGoroutines,
-			pyroscope.ProfileMutexCount,
-			pyroscope.ProfileMutexDuration,
-			pyroscope.ProfileBlockCount,
-			pyroscope.ProfileBlockDuration,
-		},
-		SampleRate: 200,
-	})
-	if err != nil {
-		panic(err)
-		return
 	}
 }
