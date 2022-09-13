@@ -74,6 +74,7 @@ func main() {
 		s := <-sig
 		switch s {
 		case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
+			pyroscope.Closed()
 			wg.Wait()
 			return
 		case syscall.SIGHUP:
